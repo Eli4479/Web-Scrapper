@@ -3,69 +3,62 @@ const CronJob = require('cron').CronJob;
 const nodemailer = require('nodemailer');
 
 const url = require('./config.json').Url;
+console.log(url);
 const RequiredPrice = require('./config.json').WantPrice;
 const Email = require('./config.json').Email;
-async function configureBrowser() {
-  const browser = await puppeteer.launch({ headless: true });
+const Password = require('./config.json').Password;
+console.log(Email);
+console.log(RequiredPrice);
+console.log(Password);
+
+
+
+const startTracking = async () => {
+  const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto(url);
-  return page;
-}
-
-async function checkPrice(page) {
+  console.log(page);
   await page.reload();
   let price = await page.evaluate(() => {
-    return document.querySelector('.a-offscreen').innerText;
+    return document.querySelector('.a-price-whole').innerText;
+  }
+  );
+  let symbol = await page.evaluate(() => {
+    return document.querySelector('.a-price-symbol').innerText;
   }
   );
   console.log(price);
-  let symbol = price.slice(0, 1);
   console.log(symbol);
-  let convertedPrice = parseInt(price.slice(1).replace(/,/g, ''));
+  let convertedPrice = parseInt(price.replace(/,/g, ''));
   console.log(convertedPrice);
-
-  let new_price = {
-    symbol,
-    convertedPrice
-  }
-  if (new_price.symbol === '₹' && new_price.convertedPrice < RequiredPrice) {
-    sendNotification(new_price);
-  }
-
-}
-
-
-
-
-
-async function startTracking() {
-  let page = await configureBrowser();
-  let job = new CronJob('*/30 * * * *', function () {
-    checkPrice(page);
-  }
-    , null, true, null, null, true);
-  job.start();
-}
-
-
-async function sendNotification(price) {
-  let transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-      user: 'patel.aryan.eee21@itbhu.ac.in',
-      pass: 'Aryan@732'
+  if (symbol === '₹' && convertedPrice < RequiredPrice) {
+    console.log("Price dropped");
+    let transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: Email,
+        pass: Password
+      }
+    });
+    let mailOptions = {
+      from: Email,
+      to: Email,
+      subject: 'Price dropped to ' + convertedPrice,
+      text: 'Check the amazon link ' + url
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      }
+      else {
+        console.log('Email sent: ' + info.response);
+      }
     }
-  });
-  let textToSend = 'Price dropped to ' + price.symbol + price.convertedPrice;
-  let htmlText = `<a href="${url}">Link</a>`;
-  let info = await transporter.sendMail({
-    from: '<aryanpatel2725@gmail.com>',
-    to: Email,
-    subject: 'Price dropped to ' + price.symbol + price.convertedPrice,
-    text: textToSend,
-    html: htmlText
-  }).then(console.log("Email sent")).catch(console.error);
+    );
+  }
 }
 
-
-startTracking();
+const job = new CronJob('*/30 * * * *', function () {
+  startTracking();
+}
+  , null, true, null, null, true);
