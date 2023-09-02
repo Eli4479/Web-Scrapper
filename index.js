@@ -3,21 +3,14 @@ const CronJob = require('cron').CronJob;
 const nodemailer = require('nodemailer');
 
 const url = require('./config.json').Url;
-console.log(url);
 const RequiredPrice = require('./config.json').WantPrice;
 const Email = require('./config.json').Email;
 const Password = require('./config.json').Password;
-console.log(Email);
-console.log(RequiredPrice);
-console.log(Password);
-
-
 
 const startTracking = async () => {
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
   await page.goto(url);
-  console.log(page);
   await page.reload();
   let price = await page.evaluate(() => {
     return document.querySelector('.a-price-whole').innerText;
@@ -27,22 +20,21 @@ const startTracking = async () => {
     return document.querySelector('.a-price-symbol').innerText;
   }
   );
-  console.log(price);
-  console.log(symbol);
   let convertedPrice = parseInt(price.replace(/,/g, ''));
-  console.log(convertedPrice);
   if (symbol === '₹' && convertedPrice < RequiredPrice) {
     console.log("Price dropped");
-    let transporter = nodemailer.createTransport({
-      service: 'Gmail',
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
       auth: {
-        user: 'aryanpatel2722@gmail.com',
-        pass: 'Aryan@732'
+        user: Email,
+        pass: Password
       }
     });
+
     let mailOptions = {
-      from: Email,
-      to: 'aryanpatel2722@gmail.com',
+      from: 'aryan <patel.aryan.eee21@itbhu.ac.in>',
+      to: 'aryanpatel2725@gmail.com',
       subject: 'Price dropped to ' + convertedPrice,
       text: 'Check the amazon link ' + url
     };
