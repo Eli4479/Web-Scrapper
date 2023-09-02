@@ -34,15 +34,15 @@ const startTracking = async () => {
   if (symbol === '₹' && convertedPrice < RequiredPrice) {
     console.log("Price dropped");
     let transporter = nodemailer.createTransport({
-      service: 'gmail',
+      service: 'Gmail',
       auth: {
-        user: Email,
-        pass: Password
+        user: 'aryanpatel2722@gmail.com',
+        pass: 'Aryan@732'
       }
     });
     let mailOptions = {
       from: Email,
-      to: Email,
+      to: 'aryanpatel2722@gmail.com',
       subject: 'Price dropped to ' + convertedPrice,
       text: 'Check the amazon link ' + url
     };
