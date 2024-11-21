@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const nodemailer = require("nodemailer");
 const { Url, WantPrice, Email, Password } = require("./config.json");
 
-const startTracking = async () => {
+const startTracking = async (intervalId) => {
   try {
     const browser = await puppeteer.launch({
       headless: true,
@@ -58,6 +58,8 @@ const startTracking = async () => {
           console.error("Error sending email:", error);
         } else {
           console.log("Email sent successfully:", info.response);
+          clearInterval(intervalId);
+          console.log("Price tracking stopped.");
         }
       });
     } else {
@@ -69,5 +71,6 @@ const startTracking = async () => {
     console.error("Error during price tracking:", error);
   }
 };
-setInterval(startTracking, 60 * 60 * 1000);
-startTracking();
+
+const intervalId = setInterval(() => startTracking(intervalId), 60 * 60 * 1000);
+startTracking(intervalId);
