@@ -60,6 +60,7 @@ const startTracking = async (intervalId) => {
     try {
         const browser = await puppeteer.launch({
             headless: true,
+            executablePath: "/usr/bin/google-chrome", // Ensure this path is correct for your system
         });
         const page = await browser.newPage();
         await page.setUserAgent(
