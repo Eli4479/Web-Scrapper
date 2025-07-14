@@ -22,8 +22,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
-  },
-  "puppeteer": {
-    "skipDownload": true
   }
 }
