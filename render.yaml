@@ -1,15 +1,20 @@
 services:
-  - type: web
-    name: prices-tracking
-    env: node
+  - name: web-scrapper
+    type: web
+    runtime: node
     plan: free
+    region: oregon
+    repo: https://github.com/Eli4479/Web-Scrapper
+    branch: main
     buildCommand: |
-      apt-get update
-      apt-get install -y wget gnupg ca-certificates
-      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-      apt install -y ./google-chrome-stable_current_amd64.deb
+      apt-get update && \
+      apt-get install -y wget gnupg ca-certificates && \
+      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
+      apt install -y ./google-chrome-stable_current_amd64.deb && \
       npm install
     startCommand: node index.js
     envVars:
-      - key: PUPPETEER_SKIP_DOWNLOAD
-        value: "true"
+      - key: PORT
+        value: 5005
+      - key: GOOGLE_CHROME_BIN
+        value: /usr/bin/google-chrome-stable
