@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer-core");
+const chromium = require('chrome-aws-lambda');
 const nodemailer = require("nodemailer");
 const express = require("express");
 const app = express();
@@ -60,12 +61,10 @@ app.post("/api", (req, res) => {
 
 const startTracking = async (intervalId) => {
     try {
-        const puppeteer = require('puppeteer-core');
-
         const browser = await puppeteer.launch({
-            headless: true,
-            executablePath: '/usr/bin/google-chrome-stable',
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
+            args: chromium.args,
+            executablePath: await chromium.executablePath,
+            headless: chromium.headless,
         });
         console.log("Browser launched successfully");
         const page = await browser.newPage();
