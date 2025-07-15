@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: prices-tracking
+    env: node
+    plan: free
+    buildCommand: |
+      apt-get update
+      apt-get install -y wget gnupg ca-certificates
+      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      apt install -y ./google-chrome-stable_current_amd64.deb
+      npm install
+    startCommand: node index.js
+    envVars:
+      - key: PUPPETEER_SKIP_DOWNLOAD
+        value: "true"

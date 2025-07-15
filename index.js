@@ -18,7 +18,9 @@ app.use(cors()); // Enable CORS for all routes (allows cross-origin requests)
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
+app.get("/", (req, res) => {
+    res.send("Welcome to the Price Tracker API");
+});
 app.post("/api", (req, res) => {
     Url = req.body.url;
     WantPrice = req.body.wantPrice;
@@ -58,11 +60,14 @@ app.post("/api", (req, res) => {
 
 const startTracking = async (intervalId) => {
     try {
+        const puppeteer = require('puppeteer-core');
+
         const browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            executablePath: '/usr/bin/google-chrome-stable' // On Render
+            executablePath: '/usr/bin/google-chrome-stable',
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
+        console.log("Browser launched successfully");
         const page = await browser.newPage();
         await page.setUserAgent(
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36"
